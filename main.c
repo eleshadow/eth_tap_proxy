@@ -15,7 +15,8 @@ void anlyze_pkt(char *interface, struct pcap_pkthdr *pkthdr, const u_char *packe
 
 int main(int argc, char *argv[])
 {
-    pthread_t thread_get_packet = 0;
+    pthread_t thread_get_packet  = 0;
+    pthread_t thread_send_packet = 0;
     struct input_dev_list dev_list;
     int ret = 0;
 
@@ -29,6 +30,13 @@ int main(int argc, char *argv[])
         return OK;
     }
 
+    ret = pthread_create(&thread_send_packet, NULL, send_packet, (void*)argv[1]);
+    if (ret != OK)
+    {
+        printf("creat send_packet_thread fail\n");
+        return ERROR;
+    }
+
     ret = pthread_create(&thread_get_packet, NULL, get_packet, (void*)&dev_list);
     if (ret != OK)
     {
@@ -38,9 +46,20 @@ int main(int argc, char *argv[])
 
     while(1)
     {
-        ret = pthread_join(thread_get_packet, NULL);
+        int ret_get  = -1;
+        int ret_send = -1;
 
-        if (ret == OK)
+        if (ret_get != 0)
+        {
+            ret_get  = pthread_join(thread_get_packet, NULL);
+        }
+
+        if (ret_send != 0)
+        {
+            ret_send = pthread_join(thread_send_packet, NULL);
+        }
+
+        if ((ret_send == 0) && (ret_get == 0))
         {
             break;
         }

@@ -21,8 +21,11 @@ struct input_dev_list{
     char **dev_name_list;
 };
 
+extern int tap_fd;
+
 extern int init_tap_interface();
 extern void anlyze_pkt(char *interface, struct pcap_pkthdr *pkthdr, const u_char *packet);
 extern void *get_packet(void *arg);
+extern void *send_packet(void *arg);
 
 #endif /* _HEADER_H_ */
