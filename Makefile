@@ -1,12 +1,17 @@
 
 CFLAGS = -g -Wall
-LDFLAGS = -lpcap
+LDFLAGS = -lpcap -lpthread
 CC = clang
 
-testpcap: main.o tap.o
+proxy: main.o getPacket.o tap.o 
 	$(CC) -o $@ $^ $(LDFLAGS) 
 
-.PHONY : clean
+main.o : head.h
+
+.PHONY : clean cleanobjs
 clean:
-	rm -rf *.o testpcap
+	-rm -rf *.o proxy
+
+cleanobjs:
+	-rm -rf *.o
 
